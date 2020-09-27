@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Ajax. Lab 1</title>
+        <title>Ajax Lab2</title>
         <link
             rel="stylesheet"
             href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
@@ -12,74 +12,24 @@
         />
     </head>
     <body>
-        <div class="container cards">
-            <div class="card-group">
-                <div class="card">
-                    <img
-                        src="https://picsum.photos/200/100"
-                        class="card-img-top"
-                        alt="..."
+        <div class="container">
+            <h1>ToDo List</h1>
+            <form>
+                <div class="form-group">
+                    <input
+                        class="form-control"
+                        type="text"
+                        name="task"
+                        placeholder="Новая задача"
                     />
-                    <div class="card-body">
-                        <h5 class="card-title">Card title</h5>
-                        <p class="card-text">
-                            This is a wider card with supporting text below as a
-                            natural lead-in to additional content. This content
-                            is a little bit longer.
-                        </p>
-                        <p class="card-text">
-                            <small class="text-muted"
-                                >Last updated 3 mins ago</small
-                            >
-                        </p>
-                    </div>
+                    <button class="btn btn-primary">Добавить задачу</button>
                 </div>
-                <div class="card">
-                    <img
-                        src="https://picsum.photos/200/100"
-                        class="card-img-top"
-                        alt="..."
-                    />
-                    <div class="card-body">
-                        <h5 class="card-title">Card title</h5>
-                        <p class="card-text">
-                            This card has supporting text below as a natural
-                            lead-in to additional content.
-                        </p>
-                        <p class="card-text">
-                            <small class="text-muted"
-                                >Last updated 3 mins ago</small
-                            >
-                        </p>
-                    </div>
-                </div>
-                <div class="card">
-                    <img
-                        src="https://picsum.photos/200/100"
-                        class="card-img-top"
-                        alt="..."
-                    />
-                    <div class="card-body">
-                        <h5 class="card-title">Card title</h5>
-                        <p class="card-text">
-                            This is a wider card with supporting text below as a
-                            natural lead-in to additional content. This card has
-                            even longer content than the first to show that
-                            equal height action.
-                        </p>
-                        <p class="card-text">
-                            <small class="text-muted"
-                                >Last updated 3 mins ago</small
-                            >
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <button class="btn btn-primary" data-more="/cards1.txt">
-                Загрузить еще
-            </button>
+            </form>
+            <h2>Список дел</h2>
+            <ul id="todos" class="list-group">
+            </ul>
         </div>
-        <!-- <script src="main.js"></script> -->
-        <script src="xhrversion.js"></script>
+
+        <script src="main.js"></script>
     </body>
 </html>

@@ -1,23 +1,71 @@
-// Получить ссылку на список карточек .cards
-const cardList // = ваш код
-// Переменная для получения кнопки
-let loadMoreBtn = null;
-// Вызов функции-инициализации
-initLoadBtn();
+// получаем ссылку на форму
+const form = document.forms[0];
+// получаем ссылку на список дел ul
+const todos = document.getElementById('todos');
 
-// Написать функцию, которая
-// 1) получает ссылку на кнопку в переменную loadMoreBtn
-// 2) Проверяет наличие кнопки на страницы
-// 3) В случае наличия кнопки добавляет на нее обработчик клика (вызов функции loadMoreHandler)
-function initLoadBtn() {}
+// загрузка задач из фейковой БД
+loadTasks();
 
-// Написать функцию, которая
-// 1) получает ссылку для запроса из дата-атрибута кнопки 'data-more'
-// 2) делает fetch запрос по ссылке
-// 3) по получению данных:
-// 3.1) с кнопки "Загрузить еще" снимается обработчик события
-// 3.2) текущая кнопка "Загрузить еще" удаляется из DOM
-// 3.3) к списку карточек добавляется полученный набор HTML-текста
-// 3.3) вызывается функция initLoadBtn для обработки новой кнопки "Загрузить еще"
-// 4) если данные не получены, должен появляться предупреждающий alert
-function loadMoreHandler() {}
+// добавление "листнера" на отправку формы
+form.addEventListener('submit', submitHandler);
+
+// обработка отправки формы с заглушкой на время отсутствия бэка
+function submitHandler(event) {
+    event.preventDefault();
+    const newTask = form.task.value;
+
+    if (newTask.length) {
+        fakePostTask(newTask)
+            .then(task => {
+                createTaskHtml(task)
+                form.reset();
+            })
+    }
+}
+
+// загрузка задач из фейковой БД (localStorage)
+function loadTasks() {
+    const storage = localStorage.getItem('tasks') || '';
+    const tasks = storage.split(';');
+
+    tasks.length &&
+        tasks.splice(0, tasks.length - 1).forEach(task => createTaskHtml(task))
+}
+
+// имитация запроса к серверу и получение ответа от него
+// пишем и комментируем fetch, реализуем загрушку через Promise
+function fakePostTask(task) {
+    // return fetch('fakeUrl', {
+    //     method: 'POST',
+    //     body: task,
+    // }).then(response => response.text())
+
+    // const xhr = new XMLHttpRequest();
+    // xhr.open('POST', 'tasks.php');
+    // xhr.send(task);
+
+    // xhr.onreadystatechange = function() {
+    //     if (xhr.readyState === 4) {
+    //         if (xhr.status === 200) {
+    //             return xhr.responseText;
+    //         }
+    //     }
+    // }
+
+    const newTaskDate = new Date().toLocaleDateString();
+    const newTaskText = `${task}. Время создания: ${newTaskDate};`
+
+    // работа с фейковой БД
+    const allItems = localStorage.getItem('tasks') || '';
+    localStorage.setItem('tasks', allItems + newTaskText);
+
+    return Promise.resolve(newTaskText);
+}
+
+// создание разметки для конкретной задачи
+function createTaskHtml(task) {
+    const li = document.createElement('li');
+    li.className = "list-group-item";
+    li.innerText = task;
+    todos.append(li);
+}
