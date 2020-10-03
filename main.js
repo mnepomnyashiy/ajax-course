@@ -1,36 +1,62 @@
-// получить форму и повесить на нее обработчик
 const addTaskForm = document.forms.newtask;
 addTaskForm.onsubmit = newTask;
-// общий список задач
 const taskList = document.querySelector('.tasks');
-
-// ссылки на конечные точки REST API задач и авторов
 const tasksUrl = `https://jsonplaceholder.typicode.com/todos`;
 const authorsUrl = `https://jsonplaceholder.typicode.com/users`;
 
-// будущие массивы задач и авторов
 let tasks = null;
 let authors = null;
 
 printAllTasks();
 
-// метод, вызывающий в себе получение всех задач и всех авторов
-// по получению задач и авторов - добавляет все задачи на страницу в общий список
-// а также вызывает метод по авто генерированию options для выбора исптолнителя
-function printAllTasks() {}
+function printAllTasks() {
+    Promise.all([getTasks(), getAuthors()]).then((data) => {
+        [tasks, authors] = data;
 
-// получить все задачи, вернуть js-объект (преобразованный из форматаJSON)
-function getTasks() {}
-// получить всех авторов, вернуть js-объект (преобразованный из форматаJSON)
-function getAuthors() {}
-// по идентификатору автора возврщает объект с его именем и прочей информацией
+        tasks.forEach((task) => {
+            const author = getAuthor(task.userId);
+            createTask({ task, author });
+        });
+        generateAuthorsSelect();
+    });
+}
+
+function newTask(e) {
+    e.preventDefault();
+
+    const title = addTaskForm.taskname.value;
+    const authorId = addTaskForm.author.value;
+
+    if (title) {
+        fetch(tasksUrl, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            body: JSON.stringify({ userId: authorId, title }),
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                const author = getAuthor(data.userId);
+                console.log(author);
+                createTask({ task: data, author });
+            });
+    } else {
+        alert('Заполните все поля формы!');
+    }
+}
+
+function getTasks() {
+    return fetch(tasksUrl + '?_limit=15').then((res) => res.json());
+}
+function getAuthors() {
+    return fetch(authorsUrl).then((res) => res.json());
+}
 function getAuthor(authorId) {
     return authors.filter((el) => el.id == authorId)[0];
 }
-// автоматическая генерация options для выбора исптолнителя
 function generateAuthorsSelect() {
-    // выбрать select из формы, заменив null
-    const select = null;
+    const select = addTaskForm.author;
 
     authors &&
         authors.forEach((author) => {
@@ -39,12 +65,39 @@ function generateAuthorsSelect() {
         });
 }
 
-// обработчик формы для создания новой задачи
-// сделать POST-запрос к списку задач, передав тело новой задачи
-// полученный в ответе результат добавить в общий список задач на странице
-function newTask() {}
+function createTask(data) {
+    const { task, author } = data;
 
-// метод создает разметку для одной задачи
-// положить в элемент <li class="list-group-item">Cras justo odio</li>
-// и прикрепить к общему списку <ul class="list-group list-group-flush tasks"></ul>
-function createTask(data) {}
+    taskList.insertAdjacentHTML(
+        'afterbegin',
+        `<li class="list-group-item" id="${task.id}">
+           <input type="checkbox" data-id="${task.id}"> ${task.title}. | <b>Исполнитель:</b> ${author.name}
+            <button class="btn btn-link" data-id="${task.id}">&times;</button> 
+        </li>`
+    );
+
+    const newTask = document.querySelector(`input[data-id="${task.id}"]`);
+    newTask.onchange = () => {
+        fetch(`https://jsonplaceholder.typicode.com/todos/${task.id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            body: JSON.stringify({ completed: newTask.checked }),
+        })
+            .then((res) => res.json())
+            .then(console.log);
+    };
+
+    const deleteTask = document.querySelector(`button[data-id="${task.id}"]`);
+    deleteTask.onclick = () => {
+        fetch(`https://jsonplaceholder.typicode.com/todos/${task.id}`, {
+            method: 'DELETE',
+        })
+            .then((res) => res.json())
+            .then(() => {
+                document.getElementById(task.id).remove();
+                alert('Задача успешно удалена');
+            });
+    };
+}
