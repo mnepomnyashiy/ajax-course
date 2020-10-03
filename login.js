@@ -1,37 +1,26 @@
-const form = document.forms.login;
-const email = form.email;
-const pass = form.password;
+// Получите ссылки на форму и ее поля
+// const form = 
+// const email = 
+// const pass = 
 
-form.addEventListener('submit', handleSubmit);
+// Добавьте обработчик события отправки формы
 
-function handleSubmit(e) {
-    e.preventDefault();
+// Напишите функцию-обработчик отправки формы
+function handleSubmit() {
+    // Не забудьте отменить действие формы по умолчанию
 
-    if (email.value && pass.value) {
-        logIn().then(({ token }) => {
-            console.log(token);
-            localStorage.setItem('authToken', token);
-            form.removeEventListener('submit', handleSubmit);
-            location.href = '/';
-        });
-    } else {
-        alert('Введите все данные');
-    }
+    // проверьте, что все поля формы заполнены (если нет, выдайте предупреждение)
+    // при заполненных полях вызовите функцию авторизации
+    // по получению данных с "сервера" сохраните полученный токен в localStorage
+    // также удалите обработчик события отправки формы и перенаправьте поситителя на главную страницу
 }
 
+// Напишите функцию авторизации
 function logIn() {
-    // return fetch('fakeurl', {
-    //     method: 'POST',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({
-    //         email: email.value,
-    //         password: pass.value,
-    //     }),
-    // }).then((response) => response.json());
+    // Подготовьте fetch-запрос на 'fakeurl' методом POST
+    // Не забудьте передать правильные заголовки и тело запроса (логин/пароль)
+    // по ответу преобразуйте значения в js-объект и верните его из функции
 
-    return Promise.resolve({
-        token: 'some token',
-    });
+    // Закомментируйте подготовленный fetch-запрос
+    // и напишите "заглушку", которая имитирует ответ с сервера и возвращает объект с токеном
 }

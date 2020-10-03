@@ -1,40 +1,29 @@
+// Кнопка выхода из системы (оставьте пустой)
 let logoutBtn = null;
+// вызов функции для проверки статуса авторизации пользователя
 isAuthenticated();
 
+// Напишите функцию-проверку статуса авторизации пользователя
 function isAuthenticated() {
-    const token = localStorage.getItem('authToken');
-    if (!token) location.href = '/login.html';
-
-    getUser(token).then(({ name }) => {
-        document.addEventListener('DOMContentLoaded', () => {
-            const username = document.getElementById('username');
-            username.innerText = name;
-
-            logoutBtn = document.getElementById('logout');
-
-            logoutBtn.addEventListener('click', handleLogOut);
-        });
-    });
+    // Получите токен из localStorage
+    // Если токен авторизации отсутствует, перенаправьте пользователя на страницу авторизации
+    // Если токен есть, то передайте его в функцию-авторизации
+    // в ответе должен прийти объект с именем пользователя
+    // добавьте обработчик на полную загрузку документа, после чего
+    // добавьте полученное имя пользователя в <span id="username">
+    // также добавьте обработчик на кнопку выхода из системы
 }
 
-function handleLogOut() {
-    localStorage.removeItem('authToken');
-    logoutBtn.removeEventListener('click', handleLogOut);
-    isAuthenticated();
-}
+// Напишите функцию выхода из системы. Она должна:
+//  1. удалять токен из localStorage,
+//  2. снимать обработчик с кнопки выхода из системы
+//  3. делать переадресацию на страницу авторизации
+function handleLogOut() {}
 
+// Напишите функцию-авторизацию
 // запрос на сервер, получающий данные пользователя по токену
 function getUser(token) {
-    // return fetch('fakeserver', {
-    //     headers: {
-    //         'X-JWT-Auth': token,
-    //     },
-    // }).then((response) => response.json()).catch((err) => {
-    //     console.error(err);
-    //     handleLogOut();
-    // });
-
-    return Promise.resolve({
-        name: 'Mikhail',
-    });
+    // Подготовьте fetch-запрос на 'fakeserver' с передачей токена авторизации
+    // по ответу, преобразуйте данные в js-объект или корректно обработайте ошибку
+    // Закомментируйте fetch-запрос и напишите заглушку, возвращающую аналог ответа сервера
 }
