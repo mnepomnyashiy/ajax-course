@@ -39,32 +39,48 @@
             </div>
         </header>
         <main class="container">
-            <form name="newtask">
+            <form name="newpost">
                 <div class="form-group">
-                    <label for="taskname">Название задачи</label>
+                    <label for="postname">Название статьи</label>
                     <input
                         class="form-control"
-                        id="taskname"
-                        name="taskname"
-                        placeholder="Название задачи"
+                        id="postname"
+                        name="postname"
+                        placeholder="Название статьи"
                     />
                 </div>
                 <div class="form-group">
-                    <label for="author">Назначить исполнителя:</label>
+                    <label for="author">Выбор автора:</label>
                     <select
                         class="form-control"
                         id="author"
                         name="author"
                     ></select>
                 </div>
+                <div class="form-group">
+                    <label for="postbody">Текст статьи</label>
+                    <textarea
+                        class="form-control"
+                        id="postbody"
+                        name="postbody"
+                        rows="3"
+                    ></textarea>
+                </div>
                 <button class="btn btn-primary mb-5">Опубликовать</button>
             </form>
 
-            <div class="row">
-                <ul class="list-group list-group-flush tasks"></ul>
+            <div class="row posts">
+                <!-- <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Пример заголовка</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            Автор статьи
+                        </h6>
+                        <p class="card-text">Пример текста статьи</p>
+                    </div> -->
                 </div>
             </div>
         </main>
-        <script src="main.js"></script>
+        <script src="example.js"></script>
     </body>
 </html>
