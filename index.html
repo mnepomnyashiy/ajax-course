@@ -14,10 +14,7 @@
         const root = document.getElementById('root');
 
         // Получите данные из xml-файла и передайте их функцию-отрисовки
-        fetch(url)
-            .then((res) => res.text())
-            .then((str) => new DOMParser().parseFromString(str, 'text/xml'))
-            .then(parseXml);
+
 
         // Напишите функцию отрисовки данных на страницу из xml
         function parseXml(xml) { }
