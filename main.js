@@ -1,103 +1,120 @@
-const addTaskForm = document.forms.newtask;
-addTaskForm.onsubmit = newTask;
-const taskList = document.querySelector('.tasks');
-const tasksUrl = `https://jsonplaceholder.typicode.com/todos`;
-const authorsUrl = `https://jsonplaceholder.typicode.com/users`;
+/* Изучите готовый код.
+Напишите graphql-запросы в заданиях из многострочных js-комментариев */
 
-let tasks = null;
-let authors = null;
+const url = 'https://graphqlzero.almansi.me/api';
 
-printAllTasks();
+// форма добавления новой задачи
+const addForm = document.forms.addtask;
+// форма поиска задач
+const searchForm = document.forms.findtask;
+// общий список задач на странице
+const todos = document.getElementById('todos');
 
-function printAllTasks() {
-    Promise.all([getTasks(), getAuthors()]).then((data) => {
-        [tasks, authors] = data;
+// обработчики форм
+addForm.addEventListener('submit', addTaskHandler);
+searchForm.addEventListener('submit', findTodos);
 
-        tasks.forEach((task) => {
-            const author = getAuthor(task.userId);
-            createTask({ task, author });
-        });
-        generateAuthorsSelect();
-    });
-}
+// функция получения данных
+const getData = (query) => {
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query }),
+    }).then((res) => res.json());
+};
+// функция изменения данных
+const postData = (mutation) => {
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query: mutation }),
+    }).then((res) => res.json());
+};
 
-function newTask(e) {
+// функция добавления новой задачи
+// вызывает postData с передачей запроса типа mutation, с полем createTodo
+// по получении ответа - создает разметку для задачи вызовом printTodo
+async function addTaskHandler(e) {
     e.preventDefault();
 
-    const title = addTaskForm.taskname.value;
-    const authorId = addTaskForm.author.value;
+    if (addForm.taskname.value) {
+        /* создайте запрос типа mutation */
+        const newTaskQuery = ``;
 
-    if (title) {
-        fetch(tasksUrl, {
-            method: 'POST',
-            headers: {
-                'Content-type': 'application/json',
-            },
-            body: JSON.stringify({ userId: authorId, title }),
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                const author = getAuthor(data.userId);
-                console.log(author);
-                createTask({ task: data, author });
-            });
-    } else {
-        alert('Заполните все поля формы!');
+        const data = await postData(newTaskQuery);
+        printTodo(data.data.createTodo);
     }
 }
 
-function getTasks() {
-    return fetch(tasksUrl + '?_limit=15').then((res) => res.json());
+// функция создания разметки для одной задачи
+function printTodo({ title, completed = false, id }) {
+    const li = document.createElement('li');
+    li.className = 'list-group-item';
+    li.innerHTML = `&nbsp; ${title} | ID: ${id} &nbsp;`;
+    li.setAttribute('data-id', id);
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    if (completed) {
+        checkbox.setAttribute('checked', 'true');
+    }
+    checkbox.addEventListener('change', handleTodoStatus);
+    li.prepend(checkbox);
+
+    const del = document.createElement('button');
+    del.className = 'btn btn-link mb-1';
+    del.innerHTML = '&times;';
+    del.addEventListener('click', handleDeleteTodo);
+    li.append(del);
+
+    todos.prepend(li);
 }
-function getAuthors() {
-    return fetch(authorsUrl).then((res) => res.json());
+
+// функция-обработчик изменения статуса задачи
+async function handleTodoStatus() {
+    const todoId = this.parentElement.dataset.id;
+
+    /* напишите запрос типа mutation с полем updateTodo
+     и параметрами id и input (с передачей в input обновленного состояния completed) */
+    const changeStatusQuery = ``;
+
+    const data = await postData(changeStatusQuery);
+    if (data.data.updateTodo.completed) {
+        this.setAttribute('checked', 'true');
+    } else {
+        this.removeAttribute('checked');
+    }
 }
-function getAuthor(authorId) {
-    return authors.filter((el) => el.id == authorId)[0];
+
+// функция-обработчик удаления задачи
+async function handleDeleteTodo() {
+    const todoId = this.parentElement.dataset.id;
+
+    /* напишите запрос типа mutation для удаления задачи по id */
+    const deleteQuery = ``;
+
+    const data = await postData(deleteQuery);
+
+    if (data.data.deleteTodo) {
+        this.parentElement.remove();
+    }
 }
-function generateAuthorsSelect() {
-    const select = addTaskForm.author;
 
-    authors &&
-        authors.forEach((author) => {
-            const option = new Option(author.name, author.id);
-            select.add(option);
-        });
-}
+// функция поиска задачи по запросу
+// формирует поисковый запрос (с сортировкой) и по ответу для каждой задачи вызывает printTodo
+async function findTodos(e) {
+    e.preventDefault();
+    const searchText = searchForm.searchname.value;
 
-function createTask(data) {
-    const { task, author } = data;
+    if (searchText) {
+        /* напишите запрос типа query для ключа todos с передачей аргументов options - search и sort (см. схему) */
+        const searchQuery = ``;
 
-    taskList.insertAdjacentHTML(
-        'afterbegin',
-        `<li class="list-group-item" id="${task.id}">
-           <input type="checkbox" data-id="${task.id}"> ${task.title}. | <b>Исполнитель:</b> ${author.name}
-            <button class="btn btn-link" data-id="${task.id}">&times;</button> 
-        </li>`
-    );
-
-    const newTask = document.querySelector(`input[data-id="${task.id}"]`);
-    newTask.onchange = () => {
-        fetch(`https://jsonplaceholder.typicode.com/todos/${task.id}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-type': 'application/json',
-            },
-            body: JSON.stringify({ completed: newTask.checked }),
-        })
-            .then((res) => res.json())
-            .then(console.log);
-    };
-
-    const deleteTask = document.querySelector(`button[data-id="${task.id}"]`);
-    deleteTask.onclick = () => {
-        fetch(`https://jsonplaceholder.typicode.com/todos/${task.id}`, {
-            method: 'DELETE',
-        })
-            .then((res) => res.json())
-            .then(() => {
-                document.getElementById(task.id).remove();
-                alert('Задача успешно удалена');
-            });
-    };
+        const data = await getData(searchQuery);
+        data.data.todos.data.forEach((todo) => printTodo(todo));
+    }
 }
