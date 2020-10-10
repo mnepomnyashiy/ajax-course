@@ -1,20 +1,12 @@
-/* Изучите готовый код.
-Напишите graphql-запросы в заданиях из многострочных js-комментариев */
-
 const url = 'https://graphqlzero.almansi.me/api';
 
-// форма добавления новой задачи
 const addForm = document.forms.addtask;
-// форма поиска задач
 const searchForm = document.forms.findtask;
-// общий список задач на странице
 const todos = document.getElementById('todos');
 
-// обработчики форм
 addForm.addEventListener('submit', addTaskHandler);
 searchForm.addEventListener('submit', findTodos);
 
-// функция получения данных
 const getData = (query) => {
     return fetch(url, {
         method: 'POST',
@@ -24,7 +16,6 @@ const getData = (query) => {
         body: JSON.stringify({ query }),
     }).then((res) => res.json());
 };
-// функция изменения данных
 const postData = (mutation) => {
     return fetch(url, {
         method: 'POST',
@@ -35,23 +26,24 @@ const postData = (mutation) => {
     }).then((res) => res.json());
 };
 
-// функция добавления новой задачи
-// вызывает postData с передачей запроса типа mutation, с полем createTodo
-// по получении ответа - создает разметку для задачи вызовом printTodo
 async function addTaskHandler(e) {
     e.preventDefault();
-
     if (addForm.taskname.value) {
-        /* создайте запрос типа mutation */
-        const newTaskQuery = ``;
+        const newTaskQuery = `mutation CreateTodo {
+            createTodo(input:{title: "${addForm.taskname.value}", completed: false}){
+              title
+              completed
+              id
+            }
+          }`;
 
         const data = await postData(newTaskQuery);
         printTodo(data.data.createTodo);
+        addForm.reset();
     }
 }
 
-// функция создания разметки для одной задачи
-function printTodo({ title, completed = false, id }) {
+function printTodo({ title, completed = false, id = '' }) {
     const li = document.createElement('li');
     li.className = 'list-group-item';
     li.innerHTML = `&nbsp; ${title} | ID: ${id} &nbsp;`;
@@ -74,13 +66,14 @@ function printTodo({ title, completed = false, id }) {
     todos.prepend(li);
 }
 
-// функция-обработчик изменения статуса задачи
 async function handleTodoStatus() {
     const todoId = this.parentElement.dataset.id;
 
-    /* напишите запрос типа mutation с полем updateTodo
-     и параметрами id и input (с передачей в input обновленного состояния completed) */
-    const changeStatusQuery = ``;
+    const changeStatusQuery = `mutation ChangeStatus {
+        updateTodo(id: "${todoId}", input: {completed: ${this.checked}}) {
+            completed
+        }
+    }`;
 
     const data = await postData(changeStatusQuery);
     if (data.data.updateTodo.completed) {
@@ -90,12 +83,11 @@ async function handleTodoStatus() {
     }
 }
 
-// функция-обработчик удаления задачи
 async function handleDeleteTodo() {
     const todoId = this.parentElement.dataset.id;
-
-    /* напишите запрос типа mutation для удаления задачи по id */
-    const deleteQuery = ``;
+    const deleteQuery = `mutation DeleteTodo {
+        deleteTodo(id: "${todoId}")
+    }`;
 
     const data = await postData(deleteQuery);
 
@@ -104,17 +96,22 @@ async function handleDeleteTodo() {
     }
 }
 
-// функция поиска задачи по запросу
-// формирует поисковый запрос (с сортировкой) и по ответу для каждой задачи вызывает printTodo
 async function findTodos(e) {
     e.preventDefault();
     const searchText = searchForm.searchname.value;
 
     if (searchText) {
-        /* напишите запрос типа query для ключа todos с передачей аргументов options - search и sort (см. схему) */
-        const searchQuery = ``;
-
+        const searchQuery = `query searchQuery{
+            todos(options:{search:{q: "${searchText}"}, sort:{field: "id", order: DESC}}){
+                data {
+                  id
+                  title
+                  completed
+                }
+              }
+        }`;
         const data = await getData(searchQuery);
+
         data.data.todos.data.forEach((todo) => printTodo(todo));
     }
 }
