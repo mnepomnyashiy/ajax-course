@@ -1,8 +1,3 @@
-/*
-    Это готовый вариант Лабораторной 4 REST API. 
-    Сделайте рефакторинг, заменив все fetch запросы на axios-запросы.
-*/
-
 const addTaskForm = document.forms.newtask;
 addTaskForm.onsubmit = newTask;
 const taskList = document.querySelector('.tasks');
@@ -16,7 +11,8 @@ printAllTasks();
 
 function printAllTasks() {
     Promise.all([getTasks(), getAuthors()]).then((data) => {
-        [tasks, authors] = data;
+        console.log(data);
+        [{ data: tasks }, { data: authors }] = data;
 
         tasks.forEach((task) => {
             const author = getAuthor(task.userId);
@@ -33,18 +29,15 @@ function newTask(e) {
     const authorId = addTaskForm.author.value;
 
     if (title) {
-        fetch(tasksUrl, {
-            method: 'POST',
-            headers: {
-                'Content-type': 'application/json',
-            },
-            body: JSON.stringify({ userId: authorId, title }),
-        })
-            .then((res) => res.json())
+        axios
+            .post(tasksUrl, {
+                userId: authorId,
+                title,
+            })
             .then((data) => {
-                const author = getAuthor(data.userId);
+                const author = getAuthor(data.data.userId);
                 console.log(author);
-                createTask({ task: data, author });
+                createTask({ task: data.data, author });
             });
     } else {
         alert('Заполните все поля формы!');
@@ -52,10 +45,10 @@ function newTask(e) {
 }
 
 function getTasks() {
-    return fetch(tasksUrl + '?_limit=15').then((res) => res.json());
+    return axios(tasksUrl + '?_limit=15');
 }
 function getAuthors() {
-    return fetch(authorsUrl).then((res) => res.json());
+    return axios(authorsUrl);
 }
 function getAuthor(authorId) {
     return authors.filter((el) => el.id == authorId)[0];
@@ -83,23 +76,17 @@ function createTask(data) {
 
     const newTask = document.querySelector(`input[data-id="${task.id}"]`);
     newTask.onchange = () => {
-        fetch(`https://jsonplaceholder.typicode.com/todos/${task.id}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-type': 'application/json',
-            },
-            body: JSON.stringify({ completed: newTask.checked }),
-        })
-            .then((res) => res.json())
+        axios
+            .patch(`https://jsonplaceholder.typicode.com/todos/${task.id}`, {
+                completed: newTask.checked,
+            })
             .then(console.log);
     };
 
     const deleteTask = document.querySelector(`button[data-id="${task.id}"]`);
     deleteTask.onclick = () => {
-        fetch(`https://jsonplaceholder.typicode.com/todos/${task.id}`, {
-            method: 'DELETE',
-        })
-            .then((res) => res.json())
+        axios
+            .delete(`https://jsonplaceholder.typicode.com/todos/${task.id}`)
             .then(() => {
                 document.getElementById(task.id).remove();
                 alert('Задача успешно удалена');
